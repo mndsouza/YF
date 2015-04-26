@@ -9,7 +9,8 @@ public enum Interval {
     
     DAILY("d"),
     WEEKLY("w"),
-    MONTHLY("m");
+    MONTHLY("m"),
+    DIVIDEND("v");
     
     private final String tag;
     

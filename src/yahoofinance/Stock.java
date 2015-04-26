@@ -5,8 +5,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import yahoofinance.histquotes.HistQuotesRequest;
-import yahoofinance.histquotes.HistoricalQuote;
+import yahoofinance.histquotes.HistoricalDividendQuote;
+import yahoofinance.histquotes.HistoricalStockQuote;
 import yahoofinance.histquotes.Interval;
 import yahoofinance.quotes.stock.StockDividend;
 import yahoofinance.quotes.stock.StockQuote;
@@ -29,7 +31,8 @@ public class Stock {
     private StockStats stats;
     private StockDividend dividend;
     
-    private List<HistoricalQuote> history;
+    private List<HistoricalStockQuote> history;
+    private List<HistoricalDividendQuote> dividendHistory;
     
     public Stock(String symbol) {
         this.symbol = symbol;
@@ -200,7 +203,7 @@ public class Stock {
      * @see         #getHistory(java.util.Calendar, yahoofinance.histquotes.Interval) 
      * @see         #getHistory(java.util.Calendar, java.util.Calendar, yahoofinance.histquotes.Interval) 
      */
-    public List<HistoricalQuote> getHistory() {
+    public List<HistoricalStockQuote> getHistory() {
         if(this.history != null) {
             return this.history;
         }
@@ -219,7 +222,7 @@ public class Stock {
      * @return              a list of historical quotes from this stock
      * @see                 #getHistory() 
      */
-    public List<HistoricalQuote> getHistory(Interval interval) {
+    public List<HistoricalStockQuote> getHistory(Interval interval) {
         return this.getHistory(HistQuotesRequest.DEFAULT_FROM, interval);
     }
     
@@ -235,7 +238,7 @@ public class Stock {
      * @return              a list of historical quotes from this stock
      * @see                 #getHistory() 
      */
-    public List<HistoricalQuote> getHistory(Calendar from) {
+    public List<HistoricalStockQuote> getHistory(Calendar from) {
         return this.getHistory(from, HistQuotesRequest.DEFAULT_TO);
     }
     
@@ -252,7 +255,7 @@ public class Stock {
      * @return              a list of historical quotes from this stock
      * @see                 #getHistory() 
      */
-    public List<HistoricalQuote> getHistory(Calendar from, Interval interval) {
+    public List<HistoricalStockQuote> getHistory(Calendar from, Interval interval) {
         return this.getHistory(from, HistQuotesRequest.DEFAULT_TO, interval);
     }
     
@@ -269,7 +272,7 @@ public class Stock {
      * @return              a list of historical quotes from this stock
      * @see                 #getHistory() 
      */
-    public List<HistoricalQuote> getHistory(Calendar from, Calendar to) {
+    public List<HistoricalStockQuote> getHistory(Calendar from, Calendar to) {
         return this.getHistory(from, to, Interval.MONTHLY);
     }
     
@@ -287,14 +290,24 @@ public class Stock {
      * @return              a list of historical quotes from this stock
      * @see                 #getHistory() 
      */
-    public List<HistoricalQuote> getHistory(Calendar from, Calendar to, Interval interval) {
+    public List<HistoricalStockQuote> getHistory(Calendar from, Calendar to, Interval interval) {
         HistQuotesRequest hist = new HistQuotesRequest(this.symbol, from, to, interval);
-        this.setHistory(hist.getResult());
+        this.setHistory(hist.getQuotes());
         return this.history;
     }
     
-    public void setHistory(List<HistoricalQuote> history) {
+    public List<HistoricalDividendQuote> getDividendHistory(Calendar from, Calendar to) {
+        HistQuotesRequest hist = new HistQuotesRequest(this.symbol, from, to, Interval.DIVIDEND);
+        this.setDividendHistory(hist.getDividendQuotes());
+        return this.dividendHistory;
+    }
+    
+    private void setHistory(List<HistoricalStockQuote> history) {
         this.history = history;
+    }
+    
+    private void setDividendHistory(List<HistoricalDividendQuote> history) {
+        this.dividendHistory = history;
     }
     
     public String getSymbol() {
